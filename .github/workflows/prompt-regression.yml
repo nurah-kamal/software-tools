@@ -1,0 +1,63 @@
+name: prompt-regression
+
+on:
+  push:
+    branches: [main]
+    paths: ['prompt-regression/**', '.github/workflows/prompt-regression.yml']
+  pull_request:
+    branches: [main]
+    paths: ['prompt-regression/**', '.github/workflows/prompt-regression.yml']
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    # Every push: the suite against the saved replies. No key, no network,
+    # and it fails if the current prompt fails any case.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: prompt-regression
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm test
+      - run: npm run regress -- --replay --compare v1,v2
+      - run: git diff --exit-code -- results/
+
+  live:
+    # Weekly and by hand: the current prompt against the live model, to catch
+    # a model update that breaks it. Needs the GEMINI_API_KEY repository secret.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: prompt-regression
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Run against the live model
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "No GEMINI_API_KEY secret set; skipping the live run."
+            exit 0
+          fi
+          npm run regress -- --record

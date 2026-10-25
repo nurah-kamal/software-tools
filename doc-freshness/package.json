@@ -1,0 +1,16 @@
+{
+  "name": "doc-freshness",
+  "version": "1.0.0",
+  "description": "Checks a document set before it is indexed: old versions still present, versions that disagree, and exact copies.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "check-set": "node bin/doc-freshness.js",
+    "example": "node bin/doc-freshness.js examples/harbour-centre/docs --title harbour-centre",
+    "test": "node --test"
+  }
+}

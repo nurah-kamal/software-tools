@@ -1,5 +1,7 @@
 # doc-freshness
 
+[![doc-freshness](https://github.com/nurah-kamal/software-tools/actions/workflows/doc-freshness.yml/badge.svg?branch=main&event=push)](https://github.com/nurah-kamal/software-tools/actions/workflows/doc-freshness.yml) 14 tests
+
 **Checks a set of documents before a search index or a chatbot reads them. It finds old versions that were never taken out, versions that disagree with no way to tell which is current, and exact copies, and lists every fact that differs with each version's value side by side. A retired contact sheet with an old emergency number looks fine on its own. It only shows up when you compare it with the version that replaced it.**
 
 `npm run example` checks the example set and prints a report. Two parts of it:

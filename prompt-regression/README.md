@@ -1,5 +1,7 @@
 # prompt-regression
 
+[![prompt-regression](https://github.com/nurah-kamal/software-tools/actions/workflows/prompt-regression.yml/badge.svg?branch=main&event=push)](https://github.com/nurah-kamal/software-tools/actions/workflows/prompt-regression.yml) 16 tests
+
 **Tests for language model output, the way unit tests work for code. A suite pins what a reply must satisfy: valid JSON, the right fields and types, exact values, no leaked contact details, and refusing what it should refuse. CI fails when a prompt or model change breaks any of it. In the example, a well-meant tidy-up of a prompt broke 9 of 12 cases, including one where the model followed an instruction hidden inside an invoice and leaked an email address.**
 
 ```

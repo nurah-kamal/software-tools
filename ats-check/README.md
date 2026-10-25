@@ -1,5 +1,7 @@
 # ats-check
 
+[![ats-check](https://github.com/nurah-kamal/software-tools/actions/workflows/ats-check.yml/badge.svg?branch=main&event=push)](https://github.com/nurah-kamal/software-tools/actions/workflows/ats-check.yml) 30 tests
+
 **Shows what an applicant tracking system actually reads from a CV PDF, and what it misses. It reads the text the way many parsers do, line by line across the page, then says what went wrong and where, with a score out of 100.**
 
 A two-column CV, read line by line:

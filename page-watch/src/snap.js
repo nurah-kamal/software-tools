@@ -22,7 +22,12 @@ export async function snapTarget(browser, target) {
   try {
     await page.setUserAgent(USER_AGENT);
     await page.goto(target.url, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-    await page.waitForSelector(target.selector, { timeout: 30_000 });
+    try {
+      await page.waitForSelector(target.selector, { timeout: 30_000 });
+    } catch {
+      // Say what loaded instead, since a redirect or a different page is the usual cause.
+      throw new Error(`${target.selector} not found on ${page.url()} ("${await page.title()}")`);
+    }
     // innerText, not textContent, so text the page hides stays out.
     const texts = await page.$$eval(target.selector, (els) => els.map((el) => el.innerText));
     const lines = normalise(texts, { group: target.group });

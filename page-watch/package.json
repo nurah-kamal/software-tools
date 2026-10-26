@@ -1,0 +1,18 @@
+{
+  "name": "page-watch",
+  "private": true,
+  "type": "module",
+  "description": "Saves the text of a part of a web page every day and writes down what changed.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "snap": "node src/snap.js",
+    "diff": "node src/diff.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "25.16.0"
+  }
+}

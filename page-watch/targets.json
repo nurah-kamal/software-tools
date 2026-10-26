@@ -6,14 +6,5 @@
     "selector": "#publication_table tbody tr",
     "source": "Statistics South Africa (Stats SA), www.statssa.gov.za",
     "key": "^(.+?) [|]"
-  },
-  {
-    "label": "statssa-headlines",
-    "name": "Stats SA headline figures",
-    "url": "https://www.statssa.gov.za/",
-    "selector": "#trends ul.trendscontent > li",
-    "source": "Statistics South Africa (Stats SA), www.statssa.gov.za",
-    "group": 2,
-    "key": "^([^:]+):"
   }
 ]

@@ -2,19 +2,18 @@
 
 [![page-watch](https://github.com/nurah-kamal/software-tools/actions/workflows/page-watch.yml/badge.svg?branch=main&event=push)](https://github.com/nurah-kamal/software-tools/actions/workflows/page-watch.yml) 13 tests
 
-**Watches part of a web page and writes down what changed. Once a day a scheduled job opens each page in headless Chrome with Puppeteer, saves the text of the part that matters as a dated snapshot, and compares it with the day before. When something changed, it writes a dated record of the lines added, removed and changed. When nothing changed, it writes nothing. It watches two Stats SA pages: the publication schedule and the headline figures.**
+**Watches part of a web page and writes down what changed. Once a day a scheduled job opens each page in headless Chrome with Puppeteer, saves the text of the part that matters as a dated snapshot, and compares it with the day before. When something changed, it writes a dated record of the lines added, removed and changed. When nothing changed, it writes nothing. It watches the Stats SA publication schedule.**
 
-The first real run, on 26 October 2026, saved this from the Stats SA home page ([snapshots/statssa-headlines/2026-10-26.txt](snapshots/statssa-headlines/2026-10-26.txt)):
+The first real run, on 26 October 2026, saved the next 10 scheduled releases ([snapshots/statssa-schedule/2026-10-26.txt](snapshots/statssa-schedule/2026-10-26.txt)). The first four lines:
 
 ```
-CPI: September 2026 = 4,5 y/y
-PPI: August 2026 = +5 y/y
-GDP: 2026 - Q2 = -0,2% q/q
-Unemployment: 2026 - Q2 = 33,6%
-Population: (Mid-year estimate) 63,52 million mid 2026
+Report-50-11-01 - Building Statistics, 2024 | 27 October 2026 (Tuesday) | 13:00
+P0352.1 - Domestic tourism survey (DTS), 2025 | 27 October 2026 (Tuesday) | 13:00
+P6410 - Tourist accommodation, August 2026 | 27 October 2026 (Tuesday) | 14:30
+P0350 - International Tourism, September 2026 | 28 October 2026 (Wednesday) | 10:00
 ```
 
-and the next 10 scheduled releases, starting with Building Statistics on 27 October at 13:00 ([snapshots/statssa-schedule/2026-10-26.txt](snapshots/statssa-schedule/2026-10-26.txt)). That was the first snapshot of each page, so there was nothing to compare with and no change record yet. Records land in `changes/` as the pages move.
+The same day, the scheduled job was run by hand on GitHub. It read the same 10 lines, so there was nothing new to commit, which is the job working as intended. That was the first snapshot, so there is no change record yet. Records land in `changes/` as the schedule moves.
 
 ## What it shows
 
@@ -30,7 +29,7 @@ and the next 10 scheduled releases, starting with Building Statistics on 27 Octo
 - **Only one job can write, and only to its own folders.** The workflow defaults to `contents: read`. The scheduled job alone gets `contents: write`, and it pushes with the job's own short-lived token passed on the command line. The checkout never stores it. It adds only `snapshots/` and `changes/`.
 - **No change, no file.** A record exists only for a day when something moved, so the folder of records is a list of real changes, not a daily log.
 - **Keep only the part that matters.** A selector picks out the table or list. Menus, banners, page furniture and anything the page hides stay out, so a new banner doesn't count as a change. The schedule page also carries a hidden contacts list with staff names and numbers, and the selector leaves it out.
-- **Normalise before comparing.** Spacing, non-breaking spaces and table tabs are tidied, and a block the page repeats to make it scroll is kept once. Otherwise every run would look different.
+- **Normalise before comparing.** Spacing, non-breaking spaces and table tabs are tidied, and a block a page repeats to make it scroll is kept once. Otherwise every run would look different.
 - **Say who is asking, and ask rarely.** Requests carry a user agent naming page-watch with a link to this folder, and each page is opened once a day.
 - **One page failing doesn't stop the others.** A page that times out or has lost its selector is reported, the rest are saved, and the run is marked failed so it shows in the Actions tab.
 
@@ -68,13 +67,15 @@ Checked on 26 October 2026, before anything was fetched.
 | Page | robots.txt | Terms | Watched |
 | --- | --- | --- | --- |
 | [Stats SA publication schedule](https://www.statssa.gov.za/?page_id=1874) | Allows everything | Stats SA's [copyright notice](https://www.statssa.gov.za/?page_id=425) lets users apply its information as they wish, provided Stats SA is acknowledged as the source and any analysis is stated as the user's own. Every change record says so. | Yes |
-| [Stats SA home page, headline figures](https://www.statssa.gov.za/) | Allows everything | As above | Yes |
+| [Stats SA home page, headline figures](https://www.statssa.gov.za/) | Allows everything | As above | No. It loaded from a laptop, but answers GitHub's servers with HTTP 403 (refused). page-watch doesn't work round a refusal. |
 | SARB current market rates | Allows the page | The SARB [disclaimer](https://www.resbank.co.za/en/home/quick-links/disclaimer) says its material may not be copied, published or distributed without its prior written consent. Saving snapshots in a public repository would do that. | No |
 | DHET register of accredited private institutions | Allows everything | No terms of use found on the site. The register is a PDF, not part of a page. | No |
 
 ## Things worth knowing
 
 **The schedule shows its first page only.** Stats SA lists the coming releases ten at a time. page-watch keeps the first ten, so a release enters the snapshot as the earlier ones are published and drop off. That is most of what the change records will show.
+
+**A refusal is respected, not worked round.** Stats SA's home page returns 403 to requests from GitHub's servers while the schedule page doesn't, so the home page was taken off the list rather than disguising the request. When a selector is missing, the error says which URL loaded and its HTTP status, which is how that was found.
 
 **A page redesign breaks the selector.** If Stats SA renames `#publication_table`, the run fails for that page and says which selector was missing. That is deliberate: an empty snapshot would look like everything had been removed.
 
